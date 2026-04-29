@@ -93,7 +93,19 @@ Convention: thin wrappers in `lib/<service>.ts`. Page files should not read env 
 
 ## How to add an example to the landing page
 
-When you scaffold a new build at `app/<slug>/page.tsx`, also add a small entry to the landing's builds list in `app/page.tsx` so the participant can navigate back to it. Each entry: name, one-line description, link to `/<slug>`.
+When you scaffold a new build at `app/<slug>/page.tsx`, add a corresponding entry to the `PROMPTS` array in `app/page.tsx` (the one rendered under the "Steal one. Or invent your own." heading inside Stage 2). Set the `slug` field — entries with a `slug` render as clickable links with a `● LIVE` badge; entries without a slug stay as static starter-prompt ideas.
+
+Example:
+\`\`\`ts
+{
+  tag: "X / TWITTER",       // the API or category
+  title: "Reply Guy",
+  body: "One-line description that reads as either a working feature or a starter prompt.",
+  slug: "x-reply",          // omit for not-yet-built prompts
+}
+\`\`\`
+
+Put live builds at the top of the list so participants see them first.
 
 ---
 

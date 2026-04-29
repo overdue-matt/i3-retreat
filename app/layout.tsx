@@ -16,6 +16,11 @@ export const metadata: Metadata = {
   title: "i3 // Sandbox",
   description:
     "Impact3 Retreat AI Day — your local sandbox for building with Claude Code in a proper development environment.",
+  icons: {
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
+  },
 };
 
 export default function RootLayout({

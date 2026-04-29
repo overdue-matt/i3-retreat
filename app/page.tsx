@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const STATUS = [
   { label: "REPO", value: "cloned", tone: "accent" as const },
   { label: "DEPS", value: "installed", tone: "accent" as const },
@@ -103,7 +105,20 @@ const STAGE_3_STEPS = [
   },
 ];
 
-const PROMPTS = [
+type Prompt = {
+  tag: string;
+  title: string;
+  body: string;
+  slug?: string;
+};
+
+const PROMPTS: Prompt[] = [
+  {
+    tag: "X / TWITTER",
+    title: "Reply Guy",
+    body: "Paste any X post URL. Get five replies in five distinct angles: insight, agree+extend, contrarian, question, humor. Pick one and ship it back to X with one click.",
+    slug: "x-reply",
+  },
   {
     tag: "X / TWITTER",
     title: "What is this person known for?",
@@ -297,29 +312,58 @@ export default function Home() {
             just to get you off zero.
           </p>
 
-          <div className="mt-8 space-y-px bg-line">
-            {PROMPTS.map((p, i) => (
-              <article
-                key={p.title}
-                className="group flex flex-col gap-4 bg-panel p-6 transition-colors hover:bg-bg-soft sm:flex-row sm:items-start sm:gap-8 sm:p-8"
-              >
-                <div className="flex shrink-0 items-baseline gap-3 sm:w-48">
-                  <span className="text-xs text-fg-dim">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <span className="rounded-sm border border-line bg-bg px-2 py-0.5 text-[10px] font-semibold tracking-widest text-accent">
-                    {p.tag}
-                  </span>
-                </div>
-                <div className="flex-1">
-                  <h4 className="text-lg font-semibold text-fg">{p.title}</h4>
-                  <p className="mt-2 text-sm leading-relaxed text-fg-muted">
-                    <span className="text-fg-dim">&gt; </span>
+          <div className="mt-8 grid gap-px border border-line bg-line md:grid-cols-2 lg:grid-cols-3">
+            {PROMPTS.map((p) => {
+              const inner = (
+                <>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="rounded-sm border border-line bg-bg px-2 py-0.5 text-[10px] font-semibold tracking-widest text-accent">
+                      {p.tag}
+                    </span>
+                    <span
+                      className={
+                        p.slug
+                          ? "text-[10px] font-semibold tracking-widest text-accent"
+                          : "text-[10px] font-semibold tracking-widest text-fg-dim"
+                      }
+                    >
+                      {p.slug ? "● LIVE" : "○ IDEA"}
+                    </span>
+                  </div>
+                  <h3 className="text-2xl font-semibold tracking-tight text-fg">
+                    {p.title}
+                  </h3>
+                  <p className="text-sm leading-relaxed text-fg-muted">
                     {p.body}
                   </p>
-                </div>
-              </article>
-            ))}
+                  {p.slug ? (
+                    <div className="mt-2 flex items-center gap-2 text-xs text-fg-dim">
+                      <span>/{p.slug}</span>
+                      <span className="text-accent transition-transform group-hover:translate-x-1">
+                        →
+                      </span>
+                    </div>
+                  ) : null}
+                </>
+              );
+
+              const baseClass =
+                "group relative flex flex-col gap-3 bg-panel p-6 transition-all sm:p-8";
+
+              return p.slug ? (
+                <Link
+                  key={p.title}
+                  href={`/${p.slug}`}
+                  className={`${baseClass} cursor-pointer hover:bg-bg-soft hover:ring-1 hover:ring-accent/60 hover:shadow-[0_0_30px_-5px_var(--accent-glow)] hover:z-10`}
+                >
+                  {inner}
+                </Link>
+              ) : (
+                <article key={p.title} className={`${baseClass}`}>
+                  {inner}
+                </article>
+              );
+            })}
           </div>
 
           {/* APIs available */}
