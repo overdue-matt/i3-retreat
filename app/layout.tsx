@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "i3 // AI Sandbox",
+  title: "i3 // Sandbox",
   description:
-    "Impact3 Retreat AI Day — your local sandbox for building with Claude and the APIs Nobody uses.",
+    "Impact3 Retreat AI Day — your local sandbox for building with Claude Code in a proper development environment.",
 };
 
 export default function RootLayout({
