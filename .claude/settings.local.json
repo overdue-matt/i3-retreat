@@ -5,7 +5,8 @@
       "Bash(npm install *)",
       "Skill(claude-api)",
       "Skill(claude-api:*)",
-      "Bash(grep -n '```' C:/Users/matty/Desktop/i3-retreat/AGENTS.md)"
+      "Bash(grep -n '```' C:/Users/matty/Desktop/i3-retreat/AGENTS.md)",
+      "Bash(npm run *)"
     ]
   }
 }

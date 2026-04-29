@@ -126,6 +126,12 @@ const PROMPTS: Prompt[] = [
     slug: "slack-chat",
   },
   {
+    tag: "NANO BANANA",
+    title: "Roast Generator",
+    body: "Paste any image. Get it back annotated with handwritten red-pen roasts, arrows, doodles, and harsh remarks. Works on profile screenshots, selfies, anything that deserves it.",
+    slug: "roast",
+  },
+  {
     tag: "X / TWITTER",
     title: "What is this person known for?",
     body: "Pull the last 100 tweets from a handle and tell me the 3 topics they're best known for, with example tweets for each.",
