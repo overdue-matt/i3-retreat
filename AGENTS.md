@@ -176,6 +176,21 @@ Wire `cache_control` on the system prompt for any feature where the participant 
 
 ---
 
+## Patterns for Slack
+
+### Bots can't read channels they aren't a member of — even public ones
+
+`conversations.history` returns `error: "not_in_channel"` for any channel where `is_member` is false. Public-vs-private doesn't change this — Slack removed the legacy "read all public" tokens years ago. This is the #1 reason a Slack build "doesn't work" on first run.
+
+Two paths:
+
+- **Public channels** — call `conversations.join` (needs the `channels:join` bot scope, which our bot has) right before reading history. The bot self-joins, then history works. No user action required.
+- **Private channels** — no API path. The user has to `/invite @YourBot` in Slack manually.
+
+`lib/slack.ts` already does the public-channel auto-join in `loadOneChannel`. Reuse it rather than rebuilding the same dance.
+
+---
+
 ## Brand assets
 
 `public/favicon.png` is the project's brand mark, used in three places:

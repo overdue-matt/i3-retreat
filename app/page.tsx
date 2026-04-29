@@ -120,6 +120,12 @@ const PROMPTS: Prompt[] = [
     slug: "x-reply",
   },
   {
+    tag: "SLACK",
+    title: "Slack chat",
+    body: "Pick channels, choose a window (24h to 30d), load every message + thread into Claude. Get a digest up top, then chat across all of it like it's one giant conversation.",
+    slug: "slack-chat",
+  },
+  {
     tag: "X / TWITTER",
     title: "What is this person known for?",
     body: "Pull the last 100 tweets from a handle and tell me the 3 topics they're best known for, with example tweets for each.",
@@ -133,11 +139,6 @@ const PROMPTS: Prompt[] = [
     tag: "LINKEDIN",
     title: "Post in someone's voice",
     body: "Pull a person's last 10 LinkedIn posts to learn their tone, then write a new post about a topic I give you in that voice.",
-  },
-  {
-    tag: "SLACK",
-    title: "Channel summarizer",
-    body: "Pull the last week from a Slack channel and give me a 5-bullet summary: what was decided, what's open, who's blocked.",
   },
   {
     tag: "DAILY BRIEF",

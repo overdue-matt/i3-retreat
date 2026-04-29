@@ -631,7 +631,7 @@ function ReplyCard({
             onClick={onReply}
             className="rounded-full bg-[#1d9bf0] px-4 py-1.5 text-xs font-bold text-white transition-colors hover:bg-[#1a8cd8]"
           >
-            Reply on X
+            Reply on X (Safe)
           </button>
         </div>
       </div>
