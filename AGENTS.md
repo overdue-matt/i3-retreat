@@ -96,16 +96,95 @@ Convention: thin wrappers in `lib/<service>.ts`. Page files should not read env 
 When you scaffold a new build at `app/<slug>/page.tsx`, add a corresponding entry to the `PROMPTS` array in `app/page.tsx` (the one rendered under the "Steal one. Or invent your own." heading inside Stage 2). Set the `slug` field — entries with a `slug` render as clickable links with a `● LIVE` badge; entries without a slug stay as static starter-prompt ideas.
 
 Example:
-\`\`\`ts
+```ts
 {
   tag: "X / TWITTER",       // the API or category
   title: "Reply Guy",
   body: "One-line description that reads as either a working feature or a starter prompt.",
   slug: "x-reply",          // omit for not-yet-built prompts
 }
-\`\`\`
+```
 
 Put live builds at the top of the list so participants see them first.
+
+---
+
+## Patterns for LLM-generated content
+
+These come from real bugs hit during this project — apply them to any build that uses Claude (or any LLM) to generate text or structured data.
+
+### Forced structured output: use `tool_use`, not `output_config.format`
+
+When you need an output with a fixed shape (exactly N fields, exactly N items), prefer the `tool_use` + `tool_choice` pattern over `output_config.format`. JSON schema in `output_config.format` does not support `minItems`/`maxItems`, so an array shape can't enforce a count and the model will silently drift (we've seen it return 25 items, or 2, instead of 5).
+
+The reliable pattern is **named required string fields** on a tool's `input_schema`:
+
+```ts
+const REPLY_TOOL: Anthropic.Tool = {
+  name: "submit_replies",
+  input_schema: {
+    type: "object",
+    properties: {
+      insight: { type: "string", description: "..." },
+      agree_extend: { type: "string", description: "..." },
+      contrarian: { type: "string", description: "..." },
+      question: { type: "string", description: "..." },
+      humor: { type: "string", description: "..." },
+    },
+    required: ["insight", "agree_extend", "contrarian", "question", "humor"],
+  },
+};
+
+await client.messages.create({
+  ...,
+  tools: [REPLY_TOOL],
+  tool_choice: { type: "tool", name: "submit_replies" },
+});
+```
+
+Five required fields = exactly five strings. Schema-enforced, no drift.
+
+### User-facing copy: kill the AI tells
+
+When prompting Claude to generate copy that should pass for human-written (replies, posts, summaries, captions), explicitly forbid AI tells in the system prompt:
+
+- **Em-dashes (—) and en-dashes (–).** Replace with commas, periods, colons, or restructure. Em-dashes are the #1 AI tell.
+- **Sycophantic openers** ("Great post!", "Love this!", "100%").
+- **Self-reference as an AI** ("As an AI...", "I'd suggest...").
+
+Also remove em-dashes from your own system prompt. The model mirrors the punctuation it sees in its context, so an em-dash-heavy prompt produces em-dash-heavy output even when you've told it not to.
+
+### Default model and parameters
+
+For hackathon-tier content generation:
+
+```ts
+{
+  model: "claude-sonnet-4-6",          // current latest Sonnet
+  max_tokens: 4096,                    // give it headroom
+  thinking: { type: "disabled" },      // creative chat doesn't need thinking
+  output_config: { effort: "medium" }, // "low" can under-instruct on Sonnet 4.6
+  system: [{
+    type: "text",
+    text: SYSTEM_PROMPT,
+    cache_control: { type: "ephemeral" }, // cache the stable bit
+  }],
+}
+```
+
+Wire `cache_control` on the system prompt for any feature where the participant might re-roll / regenerate — first call writes the cache (1.25× cost), subsequent calls read it (~0.1× cost on the cached prefix).
+
+---
+
+## Brand assets
+
+`public/favicon.png` is the project's brand mark, used in three places:
+
+1. **Site favicon.** Wired up via `metadata.icons` in `app/layout.tsx`. Don't add an `app/favicon.ico` — Next will pick that up first and override the metadata.
+2. **The user avatar in any "draft post / draft reply" preview** (e.g. the X reply cards in `app/x-reply/page.tsx` use `<img src="/favicon.png">` as the "you" avatar).
+3. Anywhere else a "this is the i3 sandbox" mark fits.
+
+Don't duplicate it as `app/icon.png`. One file, one place.
 
 ---
 
