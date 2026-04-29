@@ -1,13 +1,5 @@
 import Link from "next/link";
 
-const STATUS = [
-  { label: "REPO", value: "cloned", tone: "accent" as const },
-  { label: "DEPS", value: "installed", tone: "accent" as const },
-  { label: "DEV SERVER", value: "live", tone: "accent" as const },
-  { label: "API KEYS", value: "loaded", tone: "accent" as const },
-  { label: "CLAUDE CODE", value: "awaiting you", tone: "warn" as const },
-];
-
 const STAGE_1_STEPS = [
   "Install VS Code",
   "Install the Claude desktop app",
@@ -210,35 +202,9 @@ export default function Home() {
           </h1>
 
           <p className="mt-8 max-w-2xl text-base leading-relaxed text-fg-muted sm:text-lg">
-            By the end of today you'll have a real local dev environment, a
-            working app you built with Claude, and a public URL on the internet
-            with your name on it. Three stages. Each one unlocks the next.
+            By the end of today you'll have a real local developer environment, a
+            working app you built with Claude, and a public URL live on the internet.
           </p>
-
-          <div className="mt-10 grid grid-cols-2 gap-px overflow-hidden border border-line bg-line sm:grid-cols-5">
-            {STATUS.map((s) => (
-              <div key={s.label} className="bg-panel px-4 py-3 text-xs">
-                <div className="text-fg-dim">{s.label}</div>
-                <div
-                  className={
-                    s.tone === "accent" ? "mt-1 text-accent" : "mt-1 text-warn"
-                  }
-                >
-                  {s.tone === "accent" ? "● " : "○ "}
-                  {s.value}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Stage map */}
-          <div className="mt-12 flex flex-col gap-3 sm:flex-row sm:items-stretch">
-            <StagePill n="01" label="SETUP" sub="local dev environment" state="done" />
-            <Connector />
-            <StagePill n="02" label="BUILD" sub="claude + localhost" state="active" />
-            <Connector />
-            <StagePill n="03" label="SHIP" sub="github + vercel → live" state="next" />
-          </div>
         </div>
       </section>
 
@@ -411,21 +377,21 @@ export default function Home() {
             <div className="relative">
               <div className="flex items-center gap-3 text-xs font-semibold tracking-[0.2em] text-warn">
                 <span>⚠</span>
-                <span>BEFORE YOU PUSH ANYTHING TO GITHUB — READ THIS</span>
+                <span>HEADS UP — KEEP YOUR API KEYS PRIVATE</span>
               </div>
               <h2 className="mt-4 text-3xl font-semibold tracking-tight text-fg sm:text-4xl">
-                The .env file is the line between fine and a really bad day.
+                Your API keys are like passwords with a credit card attached.
               </h2>
               <div className="mt-6 grid gap-8 lg:grid-cols-3">
                 <div>
                   <div className="text-xs font-semibold tracking-widest text-fg-dim">
-                    01 / WHAT IT IS
+                    01 / WHAT THEY ARE
                   </div>
                   <p className="mt-3 text-sm leading-relaxed text-fg-muted">
-                    <code className="code">.env</code> is a plain text file in
-                    the project root that holds your API keys, tokens, and
-                    secrets. The app reads them from there at runtime. You
-                    already have one — the setup script generated it.
+                    A hidden file in your project folder (called{" "}
+                    <code className="code">.env</code>) holds the keys that
+                    let your app talk to Claude, Slack, X, and the rest. The
+                    setup already filled it in for you.
                   </p>
                 </div>
                 <div>
@@ -433,24 +399,22 @@ export default function Home() {
                     02 / WHY IT MATTERS
                   </div>
                   <p className="mt-3 text-sm leading-relaxed text-fg-muted">
-                    Each key is a credit card. Anyone with the key can spend
-                    money on your account, post as you, read private data. The
-                    classic vibe-coder mistake is committing{" "}
-                    <code className="code">.env</code> to a public GitHub
-                    repo. Bots scrape it within minutes.
+                    Each key can be used to spend money, post as you, or read
+                    private data. If a key ends up somewhere public — a
+                    screenshot, a chat, an open project online — bots find
+                    and abuse it within minutes.
                   </p>
                 </div>
                 <div>
                   <div className="text-xs font-semibold tracking-widest text-fg-dim">
-                    03 / HOW TO NOT GET BURNED
+                    03 / HOW TO STAY SAFE
                   </div>
                   <p className="mt-3 text-sm leading-relaxed text-fg-muted">
-                    This repo's <code className="code">.gitignore</code>{" "}
-                    already blocks <code className="code">.env</code> from
-                    being committed. Don't disable it. On Vercel, you paste
-                    the keys into the dashboard separately — they never live
-                    in the repo. If you ever leak a key, rotate it
-                    immediately.
+                    This project is already set up so your keys never get
+                    shared by accident. When you ship (next stage), you'll
+                    paste each key into a private settings page — never into
+                    the code itself. If a key ever leaks, regenerate it right
+                    away.
                   </p>
                 </div>
               </div>
@@ -458,11 +422,11 @@ export default function Home() {
                 <div className="text-fg-dim"># the rule</div>
                 <div className="mt-1">
                   <span className="text-pink">never</span>{" "}
-                  <span className="text-fg">commit .env.</span>{" "}
+                  <span className="text-fg">share your keys.</span>{" "}
                   <span className="text-pink">never</span>{" "}
-                  <span className="text-fg">paste keys in chat.</span>{" "}
+                  <span className="text-fg">paste them in chat.</span>{" "}
                   <span className="text-pink">always</span>{" "}
-                  <span className="text-fg">use the platform's env var UI when shipping.</span>
+                  <span className="text-fg">paste them into the hosting dashboard when shipping.</span>
                 </div>
               </div>
             </div>
@@ -505,29 +469,6 @@ export default function Home() {
           />
         </div>
       </Stage>
-
-      {/* Help */}
-      <section className="border-b border-line">
-        <div className="mx-auto max-w-6xl px-6 py-20">
-          <div className="grid gap-px overflow-hidden border border-line bg-line md:grid-cols-3">
-            <HelpCard
-              tag="STUCK?"
-              title="Ask Claude first."
-              body="Describe the problem. Paste the error. Tell it what you expected. It will probably fix it before you finish reading this sentence."
-            />
-            <HelpCard
-              tag="STILL STUCK?"
-              title="Grab Raul or Matthew B."
-              body="They've done the full setup end-to-end. They expect to be interrupted — that's literally the role today."
-            />
-            <HelpCard
-              tag="GOT SOMETHING WILD?"
-              title="Show & tell at the end."
-              body="Volunteers demo what they built in the final block. We capture the ones worth turning into real tools."
-            />
-          </div>
-        </div>
-      </section>
 
       <footer className="border-b border-line bg-bg-soft/40">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-6 text-xs text-fg-dim sm:flex-row sm:items-center sm:justify-between">
@@ -602,59 +543,6 @@ function Stage({
   );
 }
 
-function StagePill({
-  n,
-  label,
-  sub,
-  state,
-}: {
-  n: string;
-  label: string;
-  sub: string;
-  state: "done" | "active" | "next";
-}) {
-  const styles =
-    state === "done"
-      ? "border-accent/40 bg-accent/[0.04]"
-      : state === "active"
-        ? "border-warn/40 bg-warn/[0.04]"
-        : "border-line bg-panel";
-  const dot =
-    state === "done"
-      ? "bg-accent"
-      : state === "active"
-        ? "bg-warn live-dot"
-        : "bg-fg-dim";
-  const labelColor =
-    state === "done"
-      ? "text-accent"
-      : state === "active"
-        ? "text-warn"
-        : "text-fg-muted";
-  return (
-    <div className={`flex flex-1 items-center gap-4 border ${styles} px-5 py-4`}>
-      <div className="flex flex-col">
-        <span className="text-xs text-fg-dim">{n}</span>
-        <span className={`text-base font-semibold tracking-tight ${labelColor}`}>
-          {label}
-        </span>
-        <span className="text-xs text-fg-dim">{sub}</span>
-      </div>
-      <span className={`ml-auto h-2 w-2 rounded-full ${dot}`} />
-    </div>
-  );
-}
-
-function Connector() {
-  return (
-    <div className="hidden flex-shrink-0 items-center sm:flex">
-      <div className="h-px w-6 bg-line" />
-      <span className="text-fg-dim">→</span>
-      <div className="h-px w-6 bg-line" />
-    </div>
-  );
-}
-
 function Glossary({ term, body }: { term: string; body: string }) {
   return (
     <div className="bg-panel p-6">
@@ -664,28 +552,6 @@ function Glossary({ term, body }: { term: string; body: string }) {
       <h4 className="mt-2 text-xl font-semibold tracking-tight text-fg">
         {term}?
       </h4>
-      <p className="mt-3 text-sm leading-relaxed text-fg-muted">{body}</p>
-    </div>
-  );
-}
-
-function HelpCard({
-  tag,
-  title,
-  body,
-}: {
-  tag: string;
-  title: string;
-  body: string;
-}) {
-  return (
-    <div className="bg-panel p-6 sm:p-8">
-      <div className="text-xs font-semibold tracking-[0.2em] text-accent">
-        {tag}
-      </div>
-      <h3 className="mt-3 text-xl font-semibold tracking-tight text-fg">
-        {title}
-      </h3>
       <p className="mt-3 text-sm leading-relaxed text-fg-muted">{body}</p>
     </div>
   );
