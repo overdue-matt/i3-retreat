@@ -16,10 +16,10 @@ const ACCEPTED_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"];
 
 const SAMPLES: { src: string; label: string }[] = [
   { src: "/raul.jpg", label: "RAUL" },
-  { src: "/sample-linkedin.jpg", label: "LINKEDIN" },
-  { src: "/sample-crypto.jpg", label: "CRYPTO BRO" },
-  { src: "/sample-selfie.jpg", label: "SELFIE" },
-  { src: "/sample-vc.jpg", label: "VC HEADSHOT" },
+  { src: "/nikita.png", label: "NIKITA" },
+  { src: "/rare_matt.png", label: "RARE MATT" },
+  { src: "/donald.png", label: "DONALD" },
+  { src: "/brian.webp", label: "BRIAN" },
 ];
 
 export default function RoastPage() {
