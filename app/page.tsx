@@ -124,6 +124,12 @@ const PROMPTS: Prompt[] = [
     slug: "roast",
   },
   {
+    tag: "LINKEDIN",
+    title: "Engagement Forecaster",
+    body: "Paste a company's LinkedIn URL. We pull their last 50 posts, then score any draft against their actual history. Get predicted reactions, comments, reposts, plus three sharp edits to push the numbers up.",
+    slug: "linkedin-forecast",
+  },
+  {
     tag: "X / TWITTER",
     title: "What is this person known for?",
     body: "Pull the last 100 tweets from a handle and tell me the 3 topics they're best known for, with example tweets for each.",
@@ -132,11 +138,6 @@ const PROMPTS: Prompt[] = [
     tag: "COOKIE3",
     title: "Sentiment trend reader",
     body: "Get sentiment for a project over the last 6 months. Visualize the trend on a chart and flag anything that looks like a major shift.",
-  },
-  {
-    tag: "LINKEDIN",
-    title: "Post in someone's voice",
-    body: "Pull a person's last 10 LinkedIn posts to learn their tone, then write a new post about a topic I give you in that voice.",
   },
   {
     tag: "DAILY BRIEF",
