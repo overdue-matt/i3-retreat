@@ -94,3 +94,56 @@ export async function roastImage(input: ImagePayload): Promise<ImagePayload> {
     "Nano Banana didn't return an image. The model may have refused to roast this one. Try another image.",
   );
 }
+
+/**
+ * Generate an image from a text prompt using Nano Banana.
+ */
+export async function generateImage(prompt: string): Promise<ImagePayload> {
+  const fullPrompt = `Generate a clean, professional image for a social media post. ${prompt}. Style: modern, clean, suitable for Twitter/X. No text overlays.`;
+
+  const res = await fetch(ENDPOINT(NANO_BANANA, getKey()), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      contents: [
+        {
+          parts: [{ text: fullPrompt }],
+        },
+      ],
+    }),
+  });
+
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(
+      `Nano Banana error ${res.status}: ${body.slice(0, 400) || res.statusText}`,
+    );
+  }
+
+  const json = (await res.json()) as RestResponse;
+
+  if (json.error?.message) throw new Error(json.error.message);
+  if (json.promptFeedback?.blockReason) {
+    throw new Error(
+      `Image generation rejected by safety filter (${json.promptFeedback.blockReason}).`,
+    );
+  }
+
+  const parts = json.candidates?.[0]?.content?.parts ?? [];
+  for (const part of parts) {
+    if ("inline_data" in part && part.inline_data?.data) {
+      return {
+        base64: part.inline_data.data,
+        mimeType: part.inline_data.mime_type || "image/png",
+      };
+    }
+    if ("inlineData" in part && part.inlineData?.data) {
+      return {
+        base64: part.inlineData.data,
+        mimeType: part.inlineData.mimeType || "image/png",
+      };
+    }
+  }
+
+  throw new Error("Nano Banana didn't return an image for the prompt.");
+}

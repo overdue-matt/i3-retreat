@@ -261,3 +261,79 @@ export async function fetchTweet(
 
   return { ...main, quoted };
 }
+
+/**
+ * Fetch recent tweets from a user by username.
+ * Returns up to `count` of their most recent tweets (default 20, max 100).
+ */
+export async function fetchUserTweets(
+  username: string,
+  count: number = 20,
+): Promise<string[] | FetchError> {
+  const token = process.env.TWITTER_BEARER_TOKEN;
+  if (!token) {
+    return { error: "TWITTER_BEARER_TOKEN is missing from .env." };
+  }
+
+  // First, get user ID from username
+  const userRes = await fetch(
+    `https://api.twitter.com/2/users/by/username/${username}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: "no-store",
+    },
+  );
+
+  if (!userRes.ok) {
+    if (userRes.status === 404)
+      return { error: `User @${username} not found.`, status: 404 };
+    if (userRes.status === 401 || userRes.status === 403)
+      return {
+        error: "X API auth failed. Check TWITTER_BEARER_TOKEN.",
+        status: userRes.status,
+      };
+    return { error: `X API error (${userRes.status}).`, status: userRes.status };
+  }
+
+  const userData = (await userRes.json()) as { data?: { id: string } };
+  const userId = userData.data?.id;
+  if (!userId) {
+    return { error: `Could not find user ID for @${username}.` };
+  }
+
+  // Now fetch their tweets
+  const params = new URLSearchParams({
+    max_results: String(Math.min(count, 100)),
+    exclude: "retweets,replies",
+  });
+
+  const tweetsRes = await fetch(
+    `https://api.twitter.com/2/users/${userId}/tweets?${params}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: "no-store",
+    },
+  );
+
+  if (!tweetsRes.ok) {
+    if (tweetsRes.status === 429)
+      return {
+        error: "X API rate limit hit. Wait a minute and try again.",
+        status: 429,
+      };
+    return {
+      error: `X API error (${tweetsRes.status}).`,
+      status: tweetsRes.status,
+    };
+  }
+
+  const tweetsData = (await tweetsRes.json()) as {
+    data?: Array<{ text: string }>;
+  };
+
+  if (!tweetsData.data || tweetsData.data.length === 0) {
+    return { error: `No recent tweets found for @${username}.` };
+  }
+
+  return tweetsData.data.map((t) => t.text);
+}

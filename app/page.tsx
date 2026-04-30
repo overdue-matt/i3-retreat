@@ -132,7 +132,7 @@ const PROMPTS: Prompt[] = [
     title: "Engagement Forecaster",
     body: "Paste a company's LinkedIn URL. We pull their last 50 posts, then score any draft against their actual history. Get predicted reactions, comments, reposts, plus three sharp edits to push the numbers up.",
     slug: "linkedin-forecast",
-    color: "accent",
+    color: "info",
   },
   {
     tag: "COOKIE3",
@@ -140,6 +140,13 @@ const PROMPTS: Prompt[] = [
     body: "Type any topic. Get the 5 smartest accounts driving the conversation, their 5 sharpest takes, and a 30-second narrative summary. Cookie3 filters for signal, not volume.",
     slug: "cookie-finder",
     color: "pink",
+  },
+  {
+    tag: "GROK + X + NANO",
+    title: "News to Post",
+    body: "Enter any topic + target X handle. Grok researches recent news, analyzes their voice from past posts, generates 3 post variations (hot take, explainer, contrarian), each with a custom image. Pick one and ship.",
+    slug: "news-to-post",
+    color: "accent",
   },
 ];
 
