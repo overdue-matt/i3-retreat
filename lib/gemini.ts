@@ -99,7 +99,7 @@ export async function roastImage(input: ImagePayload): Promise<ImagePayload> {
  * Generate an image from a text prompt using Nano Banana.
  */
 export async function generateImage(prompt: string): Promise<ImagePayload> {
-  const fullPrompt = `Generate a clean, professional image for a social media post. ${prompt}. Style: modern, clean, suitable for Twitter/X. No text overlays.`;
+  const fullPrompt = `Create a high-quality, eye-catching image for a social media post on X/Twitter. ${prompt}. Requirements: professional, modern aesthetic, visually striking, suitable for news/tech content, no text overlays or watermarks. The image should grab attention in a social feed.`;
 
   const res = await fetch(ENDPOINT(NANO_BANANA, getKey()), {
     method: "POST",

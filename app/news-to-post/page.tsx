@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { generateNewsPostsAction, type PostVariation } from "./actions";
+import type { NewsStory } from "@/lib/xai";
 
 const ANGLE_COLORS = {
   hot_take: "border-warn/40 bg-warn/5 text-warn",
@@ -13,7 +14,7 @@ const ANGLE_COLORS = {
 export default function NewsToPostPage() {
   const [topic, setTopic] = useState("");
   const [targetHandle, setTargetHandle] = useState("");
-  const [news, setNews] = useState<string[] | null>(null);
+  const [news, setNews] = useState<NewsStory[] | null>(null);
   const [voiceSamples, setVoiceSamples] = useState<string[] | null>(null);
   const [posts, setPosts] = useState<PostVariation[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -151,19 +152,31 @@ export default function NewsToPostPage() {
 
               <div className="mt-6 space-y-3">
                 {news.map((story, i) => (
-                  <div
+                  <a
                     key={i}
-                    className="rounded-sm border border-line bg-panel p-4"
+                    href={story.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group block rounded-sm border border-line bg-panel p-4 transition-colors hover:border-accent/40 hover:bg-bg-soft"
                   >
                     <div className="flex items-start gap-3">
                       <span className="shrink-0 text-xs text-accent">
                         {String(i + 1).padStart(2, "0")}
                       </span>
-                      <p className="text-sm leading-relaxed text-fg">
-                        {story}
-                      </p>
+                      <div className="flex-1">
+                        <p className="text-sm leading-relaxed text-fg">
+                          {story.summary}
+                        </p>
+                        <div className="mt-2 flex items-center gap-2 text-xs text-fg-dim">
+                          <span className="font-semibold">{story.source}</span>
+                          <span>·</span>
+                          <span className="transition-colors group-hover:text-accent">
+                            View source →
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  </a>
                 ))}
               </div>
             </div>
@@ -213,10 +226,21 @@ export default function NewsToPostPage() {
               3 angles, ready to post with images
             </p>
 
-            <div className="mt-6 grid gap-6 lg:grid-cols-3">
+            <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {posts.map((post, i) => (
                 <PostCard key={i} post={post} />
               ))}
+            </div>
+
+            {/* Remix hint */}
+            <div className="mt-8 rounded-sm border border-accent/20 bg-accent/5 p-6">
+              <div className="text-[10px] font-semibold tracking-[0.2em] text-accent">
+                ↑ MIX &amp; MATCH
+              </div>
+              <p className="mt-2 text-sm leading-relaxed text-fg-muted">
+                This is a basic combination of Grok search, Gemini for images, and
+                the X API. Combine them in any way you want - just ask Claude to build it! :)
+              </p>
             </div>
           </div>
         </section>
@@ -237,9 +261,12 @@ export default function NewsToPostPage() {
 function PostCard({ post }: { post: PostVariation }) {
   const charCount = post.text.length;
   const overLimit = charCount > 280;
+  const [copied, setCopied] = useState(false);
 
   function onCopy() {
     navigator.clipboard?.writeText(post.text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   }
 
   function onPost() {
@@ -248,58 +275,92 @@ function PostCard({ post }: { post: PostVariation }) {
   }
 
   return (
-    <article className="flex flex-col rounded-sm border border-line bg-panel">
-      {/* Image */}
-      {post.image ? (
-        <div className="aspect-video w-full overflow-hidden rounded-t-sm border-b border-line bg-bg">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={`data:${post.image.mimeType};base64,${post.image.base64}`}
-            alt=""
-            className="h-full w-full object-cover"
-          />
-        </div>
-      ) : (
-        <div className="aspect-video w-full rounded-t-sm border-b border-line bg-bg flex items-center justify-center">
-          <span className="text-xs text-fg-dim">Image generation failed</span>
-        </div>
-      )}
-
-      {/* Content */}
-      <div className="flex flex-1 flex-col p-6">
+    <article className="flex flex-col overflow-hidden rounded-lg border border-line bg-panel shadow-sm transition-shadow hover:shadow-[0_0_20px_-8px_var(--accent)]">
+      {/* Angle badge */}
+      <div className="border-b border-line px-4 py-2">
         <div
-          className={`mb-3 inline-flex self-start rounded-sm border px-2 py-0.5 text-[10px] font-semibold tracking-widest ${ANGLE_COLORS[post.angle]}`}
+          className={`inline-flex rounded-sm border px-2 py-0.5 text-[10px] font-semibold tracking-widest ${ANGLE_COLORS[post.angle]}`}
         >
           {post.label}
         </div>
+      </div>
 
-        <p className="flex-1 whitespace-pre-wrap text-sm leading-relaxed text-fg">
+      {/* X-style post layout */}
+      <div className="p-4">
+        {/* Header: avatar + username */}
+        <div className="mb-3 flex items-start gap-3">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/favicon.png"
+            alt=""
+            className="h-10 w-10 shrink-0 rounded-full border border-line bg-bg"
+          />
+          <div className="flex-1">
+            <div className="flex items-center gap-1.5">
+              <span className="font-semibold text-fg">i3 Impact</span>
+              <span className="text-fg-dim">·</span>
+              <span className="text-sm text-fg-muted">@impact3</span>
+            </div>
+            <div className="text-xs text-fg-dim">Just now</div>
+          </div>
+        </div>
+
+        {/* Post text */}
+        <p className="mb-3 whitespace-pre-wrap text-[15px] leading-relaxed text-fg">
           {post.text}
         </p>
 
-        <div className="mt-4 flex items-center justify-between gap-2 border-t border-line pt-4">
+        {/* Image */}
+        {post.image ? (
+          <div className="mb-3 overflow-hidden rounded-lg border border-line bg-bg">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={`data:${post.image.mimeType};base64,${post.image.base64}`}
+              alt=""
+              className="w-full object-cover"
+            />
+          </div>
+        ) : (
+          <div className="mb-3 flex aspect-video items-center justify-center rounded-lg border border-dashed border-line bg-bg-soft">
+            <div className="text-center">
+              <div className="text-2xl text-fg-dim">🖼️</div>
+              <div className="mt-1 text-xs text-fg-dim">Image unavailable</div>
+            </div>
+          </div>
+        )}
+
+        {/* Character count */}
+        <div className="mb-3 flex items-center gap-2 text-xs">
           <span
-            className={`text-xs tabular-nums ${
-              overLimit ? "text-warn" : "text-fg-dim"
+            className={`tabular-nums ${
+              overLimit ? "font-semibold text-warn" : "text-fg-dim"
             }`}
           >
             {charCount}/280
           </span>
+          {overLimit ? (
+            <span className="text-warn">• Over limit</span>
+          ) : null}
+        </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={onCopy}
-              className="rounded-sm border border-line bg-bg px-3 py-1.5 text-xs font-semibold tracking-widest text-fg transition-colors hover:border-accent/40 hover:text-accent"
-            >
-              COPY
-            </button>
-            <button
-              onClick={onPost}
-              className="rounded-sm border border-accent/60 bg-accent/10 px-3 py-1.5 text-xs font-semibold tracking-widest text-accent transition-colors hover:bg-accent/20"
-            >
-              POST
-            </button>
-          </div>
+        {/* Action buttons */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onCopy}
+            className={`flex-1 rounded-md border px-4 py-2 text-xs font-semibold tracking-wide transition-all ${
+              copied
+                ? "border-accent bg-accent/10 text-accent"
+                : "border-line bg-bg text-fg hover:border-accent/40 hover:bg-bg-soft hover:text-accent"
+            }`}
+          >
+            {copied ? "✓ COPIED" : "COPY TEXT"}
+          </button>
+          <button
+            onClick={onPost}
+            className="flex-1 rounded-md border border-accent/60 bg-accent/10 px-4 py-2 text-xs font-semibold tracking-wide text-accent transition-all hover:bg-accent/20"
+          >
+            POST TO X →
+          </button>
         </div>
       </div>
     </article>

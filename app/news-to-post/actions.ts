@@ -1,6 +1,6 @@
 "use server";
 
-import { researchTopic, generatePostVariations } from "@/lib/xai";
+import { researchTopic, generatePostVariations, type NewsStory } from "@/lib/xai";
 import { fetchUserTweets } from "@/lib/x";
 import { generateImage, type ImagePayload } from "@/lib/gemini";
 
@@ -14,7 +14,7 @@ export type PostVariation = {
 export type GenerateResult =
   | {
       ok: true;
-      news: string[];
+      news: NewsStory[];
       voiceSamples: string[];
       posts: PostVariation[];
     }

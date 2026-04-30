@@ -18,16 +18,30 @@ function getClient(): OpenAI {
 
 export const GROK_MODEL = "grok-4.20-reasoning";
 
+export type NewsStory = {
+  summary: string;
+  url: string;
+  source: string;
+};
+
 /**
- * Research recent news on a topic and return a list of stories.
+ * Research recent news on a topic and return a list of stories with links.
  */
-export async function researchTopic(topic: string): Promise<string[]> {
+export async function researchTopic(topic: string): Promise<NewsStory[]> {
   const client = getClient();
 
-  const prompt = `Search for the 3-5 most important news stories about "${topic}" from the last 24 hours. Return only a JSON array of strings, where each string is a 1-2 sentence summary of a news story. Be factual and concise. Focus on real, recent developments.
+  const prompt = `Search for the 3-5 most important news stories about "${topic}" from the last 24 hours. For each story, provide a 1-2 sentence summary, the source URL, and the publication name.
 
-Example format:
-["Story 1 summary here.", "Story 2 summary here.", "Story 3 summary here."]`;
+Return ONLY valid JSON in this exact format:
+[
+  {
+    "summary": "Brief 1-2 sentence summary of the news.",
+    "url": "https://example.com/article",
+    "source": "Publication Name"
+  }
+]
+
+Be factual, concise, and include real URLs from credible sources.`;
 
   const response = await client.chat.completions.create({
     model: GROK_MODEL,
@@ -40,11 +54,23 @@ Example format:
   try {
     const stories = JSON.parse(content);
     if (Array.isArray(stories)) {
-      return stories.filter((s): s is string => typeof s === "string");
+      return stories.filter(
+        (s): s is NewsStory =>
+          typeof s === "object" &&
+          typeof s.summary === "string" &&
+          typeof s.url === "string" &&
+          typeof s.source === "string"
+      );
     }
   } catch {
-    // If JSON parsing fails, treat the whole response as one story
-    return [content];
+    // Fallback: treat as plain text
+    return [
+      {
+        summary: content,
+        url: "#",
+        source: "Research",
+      },
+    ];
   }
 
   return [];
@@ -61,12 +87,14 @@ type PostVariation = {
  */
 export async function generatePostVariations(
   topic: string,
-  news: string[],
+  news: NewsStory[],
   voiceSamples: string[],
 ): Promise<PostVariation[]> {
   const client = getClient();
 
-  const newsBlock = news.map((n, i) => `${i + 1}. ${n}`).join("\n");
+  const newsBlock = news
+    .map((n, i) => `${i + 1}. ${n.summary} (${n.source})`)
+    .join("\n");
   const voiceBlock = voiceSamples.map((v, i) => `${i + 1}. ${v}`).join("\n\n");
 
   const prompt = `You are a social media content generator. Given recent news about "${topic}" and sample posts from a target account, generate 3 X/Twitter posts in that account's voice.
@@ -91,7 +119,11 @@ Rules:
 - Each post must reference the actual news, not generic commentary
 - Be specific and engaging
 
-Also generate a simple image prompt for each post (10-15 words describing a visual that would accompany the post).
+Also generate a detailed image prompt for each post. The image should be eye-catching and relevant to the news topic. Describe:
+- Visual style (e.g., minimalist, bold, tech-focused, abstract)
+- Key visual elements or subject matter
+- Color mood if relevant
+- Should be specific enough to generate a compelling social media image
 
 Return ONLY valid JSON in this exact format:
 [
