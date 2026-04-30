@@ -101,7 +101,8 @@ type Prompt = {
   tag: string;
   title: string;
   body: string;
-  slug?: string;
+  slug: string;
+  color: string;
 };
 
 const PROMPTS: Prompt[] = [
@@ -110,50 +111,35 @@ const PROMPTS: Prompt[] = [
     title: "Reply Guy",
     body: "Paste any X post URL. Get five replies in five distinct angles: insight, agree+extend, contrarian, question, humor. Pick one and ship it back to X with one click.",
     slug: "x-reply",
+    color: "info",
   },
   {
     tag: "SLACK",
     title: "Slack chat",
     body: "Pick channels, choose a window (24h to 30d), load every message + thread into Claude. Get a digest up top, then chat across all of it like it's one giant conversation.",
     slug: "slack-chat",
+    color: "pink",
   },
   {
     tag: "NANO BANANA",
     title: "Roast Generator",
     body: "Paste any image. Get it back annotated with handwritten red-pen roasts, arrows, doodles, and harsh remarks. Works on profile screenshots, selfies, anything that deserves it.",
     slug: "roast",
+    color: "warn",
   },
   {
     tag: "LINKEDIN",
     title: "Engagement Forecaster",
     body: "Paste a company's LinkedIn URL. We pull their last 50 posts, then score any draft against their actual history. Get predicted reactions, comments, reposts, plus three sharp edits to push the numbers up.",
     slug: "linkedin-forecast",
+    color: "accent",
   },
   {
     tag: "COOKIE3",
     title: "Smart Account Finder",
     body: "Type any topic. Get the 5 smartest accounts driving the conversation, their 5 sharpest takes, and a 30-second narrative summary. Cookie3 filters for signal, not volume.",
     slug: "cookie-finder",
-  },
-  {
-    tag: "X / TWITTER",
-    title: "What is this person known for?",
-    body: "Pull the last 100 tweets from a handle and tell me the 3 topics they're best known for, with example tweets for each.",
-  },
-  {
-    tag: "COOKIE3",
-    title: "Sentiment trend reader",
-    body: "Get sentiment for a project over the last 6 months. Visualize the trend on a chart and flag anything that looks like a major shift.",
-  },
-  {
-    tag: "DAILY BRIEF",
-    title: "2-minute morning read",
-    body: "Build a daily brief: top crypto news + interesting moves on social. 2-minute read I can paste into a channel each morning.",
-  },
-  {
-    tag: "NANO BANANA",
-    title: "5 logos in 30 seconds",
-    body: "Generate 5 logo concepts for a project called <name> in different styles. Show them in a grid so I can pick.",
+    color: "pink",
   },
 ];
 
@@ -292,22 +278,41 @@ export default function Home() {
             just to get you off zero.
           </p>
 
-          <div className="mt-8 grid gap-px border border-line bg-line md:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {PROMPTS.map((p) => {
-              const inner = (
-                <>
+              const colorClasses = {
+                accent: "border-accent/30 bg-accent/[0.03] hover:border-accent/60 hover:shadow-[0_0_30px_-5px_rgba(163,255,18,0.35)]",
+                info: "border-info/30 bg-info/[0.03] hover:border-info/60 hover:shadow-[0_0_30px_-5px_rgba(90,209,255,0.35)]",
+                warn: "border-warn/30 bg-warn/[0.03] hover:border-warn/60 hover:shadow-[0_0_30px_-5px_rgba(255,182,39,0.35)]",
+                pink: "border-pink/30 bg-pink/[0.03] hover:border-pink/60 hover:shadow-[0_0_30px_-5px_rgba(255,77,141,0.35)]",
+              };
+
+              const tagColorClasses = {
+                accent: "text-accent border-accent/40",
+                info: "text-info border-info/40",
+                warn: "text-warn border-warn/40",
+                pink: "text-pink border-pink/40",
+              };
+
+              const liveColorClasses = {
+                accent: "text-accent",
+                info: "text-info",
+                warn: "text-warn",
+                pink: "text-pink",
+              };
+
+              return (
+                <Link
+                  key={p.title}
+                  href={`/${p.slug}`}
+                  className={`group relative flex flex-col gap-3 rounded-sm border p-6 transition-all sm:p-8 cursor-pointer hover:bg-bg-soft hover:z-10 ${colorClasses[p.color as keyof typeof colorClasses]}`}
+                >
                   <div className="flex items-center justify-between gap-3">
-                    <span className="rounded-sm border border-line bg-bg px-2 py-0.5 text-[10px] font-semibold tracking-widest text-accent">
+                    <span className={`rounded-sm border bg-bg px-2 py-0.5 text-[10px] font-semibold tracking-widest ${tagColorClasses[p.color as keyof typeof tagColorClasses]}`}>
                       {p.tag}
                     </span>
-                    <span
-                      className={
-                        p.slug
-                          ? "text-[10px] font-semibold tracking-widest text-accent"
-                          : "text-[10px] font-semibold tracking-widest text-fg-dim"
-                      }
-                    >
-                      {p.slug ? "● LIVE" : "○ IDEA"}
+                    <span className={`text-[10px] font-semibold tracking-widest ${liveColorClasses[p.color as keyof typeof liveColorClasses]}`}>
+                      ● LIVE
                     </span>
                   </div>
                   <h3 className="text-2xl font-semibold tracking-tight text-fg">
@@ -316,32 +321,13 @@ export default function Home() {
                   <p className="text-sm leading-relaxed text-fg-muted">
                     {p.body}
                   </p>
-                  {p.slug ? (
-                    <div className="mt-2 flex items-center gap-2 text-xs text-fg-dim">
-                      <span>/{p.slug}</span>
-                      <span className="text-accent transition-transform group-hover:translate-x-1">
-                        →
-                      </span>
-                    </div>
-                  ) : null}
-                </>
-              );
-
-              const baseClass =
-                "group relative flex flex-col gap-3 bg-panel p-6 transition-all sm:p-8";
-
-              return p.slug ? (
-                <Link
-                  key={p.title}
-                  href={`/${p.slug}`}
-                  className={`${baseClass} cursor-pointer hover:bg-bg-soft hover:ring-1 hover:ring-accent/60 hover:shadow-[0_0_30px_-5px_var(--accent-glow)] hover:z-10`}
-                >
-                  {inner}
+                  <div className="mt-2 flex items-center gap-2 text-xs text-fg-dim">
+                    <span>/{p.slug}</span>
+                    <span className={`transition-transform group-hover:translate-x-1 ${liveColorClasses[p.color as keyof typeof liveColorClasses]}`}>
+                      →
+                    </span>
+                  </div>
                 </Link>
-              ) : (
-                <article key={p.title} className={`${baseClass}`}>
-                  {inner}
-                </article>
               );
             })}
           </div>
@@ -375,71 +361,6 @@ export default function Home() {
           </div>
         </div>
       </Stage>
-
-      {/* Security primer — between build and ship */}
-      <section className="border-b border-line">
-        <div className="mx-auto max-w-6xl px-6 py-16 sm:py-20">
-          <div className="relative overflow-hidden rounded-sm border border-warn/40 bg-warn/[0.04] p-6 sm:p-10">
-            <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-warn/10 blur-3xl" />
-            <div className="relative">
-              <div className="flex items-center gap-3 text-xs font-semibold tracking-[0.2em] text-warn">
-                <span>⚠</span>
-                <span>HEADS UP — KEEP YOUR API KEYS PRIVATE</span>
-              </div>
-              <h2 className="mt-4 text-3xl font-semibold tracking-tight text-fg sm:text-4xl">
-                Your API keys are like passwords with a credit card attached.
-              </h2>
-              <div className="mt-6 grid gap-8 lg:grid-cols-3">
-                <div>
-                  <div className="text-xs font-semibold tracking-widest text-fg-dim">
-                    01 / WHAT THEY ARE
-                  </div>
-                  <p className="mt-3 text-sm leading-relaxed text-fg-muted">
-                    A hidden file in your project folder (called{" "}
-                    <code className="code">.env</code>) holds the keys that
-                    let your app talk to Claude, Slack, X, and the rest. The
-                    setup already filled it in for you.
-                  </p>
-                </div>
-                <div>
-                  <div className="text-xs font-semibold tracking-widest text-fg-dim">
-                    02 / WHY IT MATTERS
-                  </div>
-                  <p className="mt-3 text-sm leading-relaxed text-fg-muted">
-                    Each key can be used to spend money, post as you, or read
-                    private data. If a key ends up somewhere public — a
-                    screenshot, a chat, an open project online — bots find
-                    and abuse it within minutes.
-                  </p>
-                </div>
-                <div>
-                  <div className="text-xs font-semibold tracking-widest text-fg-dim">
-                    03 / HOW TO STAY SAFE
-                  </div>
-                  <p className="mt-3 text-sm leading-relaxed text-fg-muted">
-                    This project is already set up so your keys never get
-                    shared by accident. When you ship (next stage), you'll
-                    paste each key into a private settings page — never into
-                    the code itself. If a key ever leaks, regenerate it right
-                    away.
-                  </p>
-                </div>
-              </div>
-              <div className="mt-8 rounded-sm border border-line bg-bg p-4 font-mono text-xs text-fg-muted">
-                <div className="text-fg-dim"># the rule</div>
-                <div className="mt-1">
-                  <span className="text-pink">never</span>{" "}
-                  <span className="text-fg">share your keys.</span>{" "}
-                  <span className="text-pink">never</span>{" "}
-                  <span className="text-fg">paste them in chat.</span>{" "}
-                  <span className="text-pink">always</span>{" "}
-                  <span className="text-fg">paste them into the hosting dashboard when shipping.</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Stage 3 — Ship */}
       <Stage
