@@ -130,6 +130,12 @@ const PROMPTS: Prompt[] = [
     slug: "linkedin-forecast",
   },
   {
+    tag: "COOKIE3",
+    title: "Smart Account Finder",
+    body: "Type any topic. Get the 5 smartest accounts driving the conversation, their 5 sharpest takes, and a 30-second narrative summary. Cookie3 filters for signal, not volume.",
+    slug: "cookie-finder",
+  },
+  {
     tag: "X / TWITTER",
     title: "What is this person known for?",
     body: "Pull the last 100 tweets from a handle and tell me the 3 topics they're best known for, with example tweets for each.",

@@ -7,7 +7,10 @@
       "Skill(claude-api:*)",
       "Bash(grep -n '```' C:/Users/matty/Desktop/i3-retreat/AGENTS.md)",
       "Bash(npm run *)",
-      "Bash(npx next *)"
+      "Bash(npx next *)",
+      "WebSearch",
+      "WebFetch(domain:docs.cookie-api.com)",
+      "WebFetch(domain:docs.cookie3.com)"
     ]
   }
 }
